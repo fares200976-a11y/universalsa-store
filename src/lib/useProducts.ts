@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { models as localModels } from "@/data/brands";
 
 export interface ApiProduct {
   id: number;
@@ -14,31 +15,36 @@ export interface ApiProduct {
   createdAt: string;
 }
 
-const POLL_INTERVAL = 30_000; // 30 secondes
-
 export function useProducts() {
   const [products, setProducts] = useState<ApiProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchProducts = useCallback(async () => {
-    try {
-      const r = await fetch("/api/products");
-      if (r.ok) {
-        const data = await r.json();
-        setProducts(data);
-      }
-    } catch {
-      // silently ignore network errors on background polls
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchProducts();
-    const interval = setInterval(fetchProducts, POLL_INTERVAL);
-    return () => clearInterval(interval);
-  }, [fetchProducts]);
+    // Convertir les modèles locaux en produits
+    const allProducts: ApiProduct[] = [];
+    let id = 1;
+    
+    for (const [brand, modelList] of Object.entries(localModels)) {
+      for (const model of modelList) {
+        allProducts.push({
+          id: id++,
+          brand: brand,
+          brandName: brand.charAt(0).toUpperCase() + brand.slice(1),
+          modelName: model.name,
+          price: model.price,
+          imagePath: model.image || null,
+          active: true,
+          type: "7d", // Par défaut, à ajuster selon vos besoins
+          isNew: false,
+          isPromo: false,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+    
+    setProducts(allProducts);
+    setLoading(false);
+  }, []);
 
   return { products, loading };
 }

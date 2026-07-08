@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { models as localModels } from "@/data/brands";
 
 export interface ApiProduct {
   id: number;
@@ -14,56 +15,35 @@ export interface ApiProduct {
   createdAt: string;
 }
 
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ33cuOQXP0RAlzfevrNPfKANI_iMTEDxGW_b-rOQLx7KU0QLRUphB99BnxIJTU9jg-4QMJTg0LzxZe/pub?output=csv";
-
-function parseCSV(csvText: string): ApiProduct[] {
-  const lines = csvText.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.trim());
-  const products: ApiProduct[] = [];
-  
-  for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',');
-    const row: any = {};
-    headers.forEach((h, idx) => {
-      row[h] = values[idx]?.trim();
-    });
-    
-    if (row.id && row.name) {
-      products.push({
-        id: parseInt(row.id) || i,
-        brand: row.brand || '',
-        brandName: (row.brand || '').charAt(0).toUpperCase() + (row.brand || '').slice(1),
-        modelName: row.model || row.name || '',
-        price: parseInt(row.price) || 0,
-        imagePath: row.image_url || null,
-        active: row.active?.toLowerCase() === 'true' || row.active === '1',
-        type: row.type || '7d',
-        isNew: false,
-        isPromo: false,
-        createdAt: new Date().toISOString(),
-      });
-    }
-  }
-  
-  return products;
-}
-
 export function useProducts() {
   const [products, setProducts] = useState<ApiProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(SHEET_URL)
-      .then(r => r.text())
-      .then(csvText => {
-        const data = parseCSV(csvText);
-        setProducts(data);
-      })
-      .catch(err => {
-        console.error("Error fetching products:", err);
-        setProducts([]);
-      })
-      .finally(() => setLoading(false));
+    // Utiliser les données locales (comme avant)
+    const allProducts: ApiProduct[] = [];
+    let id = 1;
+    
+    for (const [brand, modelList] of Object.entries(localModels)) {
+      for (const model of modelList) {
+        allProducts.push({
+          id: id++,
+          brand: brand,
+          brandName: brand.charAt(0).toUpperCase() + brand.slice(1),
+          modelName: model.name,
+          price: model.price,
+          imagePath: model.image || null,
+          active: true,
+          type: "7d",
+          isNew: false,
+          isPromo: false,
+          createdAt: new Date().toISOString(),
+        });
+      }
+    }
+    
+    setProducts(allProducts);
+    setLoading(false);
   }, []);
 
   return { products, loading };

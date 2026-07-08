@@ -11,7 +11,6 @@ export default function Admin() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // Si d√©j√† connect√©, rediriger vers dashboard
     checkSession();
   }, []);
 
@@ -66,7 +65,7 @@ export default function Admin() {
   return (
     <div className="admin-login">
       <div className="login-box">
-        <h1>Ì¥ê Admin UniversalSA</h1>
+        <h1>Admin UniversalSA</h1>
         <form onSubmit={handleLogin}>
           <input
             type="email"

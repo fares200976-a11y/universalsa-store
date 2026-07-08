@@ -1,0 +1,202 @@
+[
+  {
+    "id": 1,
+    "name": "Volkswagen Caddy Avant et Arrière",
+    "type": "7d",
+    "brand": "volkswagen",
+    "model": "Caddy",
+    "price": 9500,
+    "image": "/assets/caddy.webp",
+    "active": true
+  },
+  {
+    "id": 2,
+    "name": "Volkswagen T-Roc Avant et Arrière",
+    "type": "7d",
+    "brand": "volkswagen",
+    "model": "T-Roc",
+    "price": 9500,
+    "image": "/assets/troc.webp",
+    "active": true
+  },
+  {
+    "id": 3,
+    "name": "Volkswagen Golf 7 Avant et Arrière",
+    "type": "7d",
+    "brand": "volkswagen",
+    "model": "Golf 7",
+    "price": 9500,
+    "image": "/assets/golf8.webp",
+    "active": true
+  },
+  {
+    "id": 4,
+    "name": "Volkswagen Golf 8 Avant et Arrière",
+    "type": "7d",
+    "brand": "volkswagen",
+    "model": "Golf 8",
+    "price": 9500,
+    "image": "/assets/golf8.webp",
+    "active": true
+  },
+  {
+    "id": 5,
+    "name": "Volkswagen Passat Avant et Arrière",
+    "type": "7d",
+    "brand": "volkswagen",
+    "model": "Passat",
+    "price": 9500,
+    "image": "/assets/passat.webp",
+    "active": true
+  },
+  {
+    "id": 6,
+    "name": "Volkswagen Tiguan Avant et Arrière",
+    "type": "7d",
+    "brand": "volkswagen",
+    "model": "Tiguan",
+    "price": 9500,
+    "image": "/assets/tiguan.webp",
+    "active": true
+  },
+  {
+    "id": 7,
+    "name": "Volkswagen Polo Avant et Arrière",
+    "type": "7d",
+    "brand": "volkswagen",
+    "model": "Polo",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 8,
+    "name": "Audi Q5 2009-2018 Avant et Arrière",
+    "type": "7d",
+    "brand": "audi",
+    "model": "Q5",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 9,
+    "name": "Audi Q3 Nouveau Avant et Arrière",
+    "type": "7d",
+    "brand": "audi",
+    "model": "Q3",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 10,
+    "name": "Peugeot 2008 Avant Arrière 2020-2022",
+    "type": "7d",
+    "brand": "peugeot",
+    "model": "2008",
+    "price": 9800,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 11,
+    "name": "Peugeot 3008 Avant Arrière 2013-2019",
+    "type": "7d",
+    "brand": "peugeot",
+    "model": "3008",
+    "price": 9800,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 12,
+    "name": "Hyundai Tucson 2015-2020 Avant et Arrière",
+    "type": "7d",
+    "brand": "hyundai",
+    "model": "Tucson",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 13,
+    "name": "Hyundai Creta 2025 Avant et Arrière",
+    "type": "7d",
+    "brand": "hyundai",
+    "model": "Creta",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 14,
+    "name": "Hyundai Accent ancien (GLS) Avant et Arrière",
+    "type": "7d",
+    "brand": "hyundai",
+    "model": "Accent",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 15,
+    "name": "Hyundai i10 Avant et Arrière",
+    "type": "7d",
+    "brand": "hyundai",
+    "model": "i10",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 16,
+    "name": "Hyundai i20 Avant et Arrière",
+    "type": "7d",
+    "brand": "hyundai",
+    "model": "i20",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 17,
+    "name": "Fiat 500 Avant et Arrière",
+    "type": "7d",
+    "brand": "fiat",
+    "model": "500",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 18,
+    "name": "Fiat 500X Avant et Arrière",
+    "type": "7d",
+    "brand": "fiat",
+    "model": "500X",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 19,
+    "name": "Fiat Tipo Avant et Arrière",
+    "type": "7d",
+    "brand": "fiat",
+    "model": "Tipo",
+    "price": 9500,
+    "image": "",
+    "active": true
+  },
+  {
+    "id": 20,
+    "name": "Fiat Doblo Panorama Avant et Arrière",
+    "type": "7d",
+    "brand": "fiat",
+    "model": "Doblo",
+    "price": 9500,
+    "image": "",
+    "active": true
+  }
+]

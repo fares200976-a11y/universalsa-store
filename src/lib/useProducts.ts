@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { models as localModels } from "@/data/brands";
+import productsData from "@/data/products.json";
 
 export interface ApiProduct {
   id: number;
@@ -20,29 +20,21 @@ export function useProducts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Utiliser les données locales (comme avant)
-    const allProducts: ApiProduct[] = [];
-    let id = 1;
+    const mappedProducts = productsData.map(p => ({
+      id: p.id,
+      brand: p.brand,
+      brandName: p.brand.charAt(0).toUpperCase() + p.brand.slice(1),
+      modelName: p.model,
+      price: p.price,
+      imagePath: p.image || null,
+      active: p.active,
+      type: p.type,
+      isNew: false,
+      isPromo: false,
+      createdAt: new Date().toISOString(),
+    }));
     
-    for (const [brand, modelList] of Object.entries(localModels)) {
-      for (const model of modelList) {
-        allProducts.push({
-          id: id++,
-          brand: brand,
-          brandName: brand.charAt(0).toUpperCase() + brand.slice(1),
-          modelName: model.name,
-          price: model.price,
-          imagePath: model.image || null,
-          active: true,
-          type: "7d",
-          isNew: false,
-          isPromo: false,
-          createdAt: new Date().toISOString(),
-        });
-      }
-    }
-    
-    setProducts(allProducts);
+    setProducts(mappedProducts);
     setLoading(false);
   }, []);
 

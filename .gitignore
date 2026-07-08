@@ -24,3 +24,6 @@ npm-debug.log*
 
 # CSV imports (données)
 src/data/*.csv
+
+.vercel
+.env*

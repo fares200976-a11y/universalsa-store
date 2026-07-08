@@ -11,7 +11,6 @@ export default function Admin() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // Si déjà connecté, rediriger vers dashboard
     checkSession();
   }, []);
 
@@ -23,7 +22,6 @@ export default function Admin() {
         .select("role")
         .eq("id", session.user.id)
         .single();
-      
       if (userData?.role === "admin") {
         setLocation("/admin/dashboard");
       }

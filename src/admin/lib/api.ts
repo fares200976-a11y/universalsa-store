@@ -1,87 +1,51 @@
-export const API_BASE = "/api";
+import { supabase } from "@/lib/supabase";
 
-export function authHeader(token: string): Record<string, string> {
-  return { Authorization: `Bearer ${token}` };
+export async function getOrders(status?: string) {
+  let query = supabase
+    .from("orders")
+    .select("*, products(name, brand, model, price)")
+    .order("created_at", { ascending: false });
+
+  if (status) query = query.eq("status", status);
+
+  const { data, error } = await query;
+  return { data: data || [], error };
 }
 
-export class ApiError extends Error {
-  status: number;
-  constructor(message: string, status: number) {
-    super(message);
-    this.status = status;
-  }
+export async function updateOrderStatus(id: number, status: string) {
+  const { error } = await supabase
+    .from("orders")
+    .update({ status })
+    .eq("id", id);
+  return { error };
 }
 
-interface ApiFetchOptions {
-  method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
-  body?: unknown;
-  token?: string;
-  signal?: AbortSignal;
+export async function getProducts() {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
+  return { data: data || [], error };
 }
 
-/**
- * Thin fetch wrapper for the admin. Attaches the bearer token, serializes JSON
- * bodies, and throws an ApiError with the server message on non-2xx responses.
- */
-export async function apiFetch<T = unknown>(
-  path: string,
-  { method = "GET", body, token, signal }: ApiFetchOptions = {},
-): Promise<T> {
-  const headers: Record<string, string> = {};
-  if (token) Object.assign(headers, authHeader(token));
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+export async function getStats() {
+  const { count: totalOrders } = await supabase
+    .from("orders")
+    .select("*", { count: "exact", head: true });
 
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-    signal,
-  });
+  const { count: pendingOrders } = await supabase
+    .from("orders")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "pending");
 
-  if (res.status === 204) return undefined as T;
+  const { count: totalProducts } = await supabase
+    .from("products")
+    .select("*", { count: "exact", head: true })
+    .eq("active", true);
 
-  let data: unknown = null;
-  const text = await res.text();
-  if (text) {
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = text;
-    }
-  }
-
-  if (!res.ok) {
-    const message =
-      (data && typeof data === "object" && "error" in data
-        ? String((data as { error: unknown }).error)
-        : typeof data === "string" && data
-          ? data
-          : `Erreur ${res.status}`) || `Erreur ${res.status}`;
-    throw new ApiError(message, res.status);
-  }
-
-  return data as T;
-}
-
-/** Upload a single file (image or video) and return its public URL. */
-export async function uploadImage(file: File, token: string): Promise<string> {
-  const fd = new FormData();
-  fd.append("image", file);
-  const res = await fetch(`${API_BASE}/upload`, {
-    method: "POST",
-    headers: authHeader(token),
-    body: fd,
-  });
-  if (!res.ok) {
-    let msg = "Échec de l'envoi du fichier";
-    try {
-      const d = await res.json();
-      if (d?.error) msg = String(d.error);
-    } catch {
-      /* ignore */
-    }
-    throw new ApiError(msg, res.status);
-  }
-  const data = await res.json();
-  return data.url as string;
+  return {
+    totalOrders: totalOrders || 0,
+    pendingOrders: pendingOrders || 0,
+    totalProducts: totalProducts || 0,
+  };
 }

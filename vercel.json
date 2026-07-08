@@ -1,6 +1,18 @@
 {
-  "rewrites": [
-    { "source": "/admin/:path*", "destination": "/index.html" },
-    { "source": "/admin", "destination": "/index.html" }
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist",
+        "buildCommand": "npm install && npm run build"
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/admin/(.*)", "dest": "/index.html" },
+    { "src": "/admin", "dest": "/index.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

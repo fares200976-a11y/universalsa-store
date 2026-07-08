@@ -13,6 +13,7 @@ import Home from "@/pages/home";
 import Brands from "@/pages/brands";
 import Models from "@/pages/models";
 import Admin from "@/pages/admin";
+import AdminDashboard from "@/pages/admin-dashboard";
 import Voitures from "@/pages/voitures";
 import Page from "@/pages/page";
 
@@ -56,7 +57,11 @@ function ScrollToTop() {
 function Router() {
   return (
     <Switch>
+      {/* Routes Admin - SANS Navbar/Footer */}
       <Route path="/admin" component={Admin} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
+      
+      {/* Routes Site - AVEC Navbar/Footer */}
       <Route>
         <VisitorPing />
         <ScrollToTop />

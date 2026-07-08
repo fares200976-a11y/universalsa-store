@@ -1,39 +1,16 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
-import { supabase } from "@/lib/supabase";
-import "@/admin/admin.css";
+import { useState } from 'react';
+import { supabase } from '../lib/supabase';
 
-export default function Admin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+export default function AdminLogin() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [, setLocation] = useLocation();
-
-  useEffect(() => {
-    // Si déjà connecté, rediriger vers dashboard
-    checkSession();
-  }, []);
-
-  async function checkSession() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      const { data: userData } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", session.user.id)
-        .single();
-      
-      if (userData?.role === "admin") {
-        setLocation("/admin/dashboard");
-      }
-    }
-  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError('');
 
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
@@ -46,20 +23,21 @@ export default function Admin() {
       return;
     }
 
+    // Vérifier rôle admin
     const { data: userData } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", data.user.id)
+      .from('users')
+      .select('role')
+      .eq('id', data.user.id)
       .single();
 
-    if (userData?.role !== "admin") {
+    if (userData?.role !== 'admin') {
       await supabase.auth.signOut();
-      setError("Accès réservé aux administrateurs");
+      setError('Accès réservé aux administrateurs');
       setLoading(false);
       return;
     }
 
-    setLocation("/admin/dashboard");
+    window.location.href = '/admin/dashboard';
     setLoading(false);
   }
 
@@ -83,7 +61,7 @@ export default function Admin() {
             required
           />
           <button type="submit" disabled={loading}>
-            {loading ? "Connexion..." : "Se connecter"}
+            {loading ? 'Connexion...' : 'Se connecter'}
           </button>
           {error && <p className="error">{error}</p>}
         </form>

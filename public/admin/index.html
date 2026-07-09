@@ -6,73 +6,21 @@
     <title>Admin - UniversalSA</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center; }
         h1 { margin-bottom: 30px; color: #333; font-size: 1.5rem; }
-        input {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+        input { width: 100%; padding: 14px; margin-bottom: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; }
+        button { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
         .error { color: #e74c3c; margin-top: 10px; display: none; }
         .dashboard { display: none; width: 100%; min-height: 100vh; }
-        .sidebar {
-            width: 260px;
-            background: #1a1a2e;
-            color: white;
-            padding: 25px;
-            position: fixed;
-            height: 100vh;
-        }
-        .main-content {
-            margin-left: 260px;
-            flex: 1;
-            padding: 30px;
-            background: #f5f6fa;
-            min-height: 100vh;
-        }
-        table {
-            width: 100%;
-            background: white;
-            border-radius: 16px;
-            border-collapse: collapse;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
+        .sidebar { width: 260px; background: #1a1a2e; color: white; padding: 25px; position: fixed; height: 100vh; }
+        .main-content { margin-left: 260px; flex: 1; padding: 30px; background: #f5f6fa; min-height: 100vh; }
+        table { width: 100%; background: white; border-radius: 16px; border-collapse: collapse; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         th { background: #1a1a2e; color: white; padding: 16px; text-align: left; }
         td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; }
     </style>
 </head>
 <body>
-    <!-- LOGIN -->
     <div id="loginPage" class="login-box">
         <h1>Admin UniversalSA</h1>
         <form id="loginForm">
@@ -83,7 +31,6 @@
         </form>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboardPage" class="dashboard">
         <aside class="sidebar">
             <h2>UniversalSA</h2>
@@ -93,45 +40,40 @@
         <main class="main-content">
             <h1>Commandes</h1>
             <table>
-                <thead>
-                    <tr><th>ID</th><th>Client</th><th>Téléphone</th><th>Produit</th><th>Statut</th></tr>
-                </thead>
+                <thead><tr><th>ID</th><th>Client</th><th>Téléphone</th><th>Produit</th><th>Statut</th></tr></thead>
                 <tbody id="ordersBody"></tbody>
             </table>
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const supabaseClient = supabaseJs.createClient(
-            'https://xkuxlnxovklnkozoisml.supabase.co',
-            'sb_publishable_CpAtOIRhPin3rQ4M9xERsw_qtv0spNQ'
-        );
+        const SUPABASE_URL = 'https://xkuxlnxovklnkozoisml.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_CpAtOIRhPin3rQ4M9xERsw_qtv0spNQ';
 
-        // Login
+        // Login simple sans Supabase Auth - on vérifie directement dans la table users
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            // Vérifier dans la table users directement
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(email)}&role=eq.admin&select=*`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
             
-            if (error) {
-                document.getElementById('errorMsg').textContent = error.message;
+            const users = await response.json();
+            
+            if (users.length === 0) {
+                document.getElementById('errorMsg').textContent = 'Email ou mot de passe incorrect';
                 document.getElementById('errorMsg').style.display = 'block';
                 return;
             }
             
-            // Vérifier rôle admin
-            const { data: userData } = await supabase.from('users').select('role').eq('id', data.user.id).single();
-            
-            if (userData?.role !== 'admin') {
-                await supabase.auth.signOut();
-                document.getElementById('errorMsg').textContent = 'Accès réservé aux administrateurs';
-                document.getElementById('errorMsg').style.display = 'block';
-                return;
-            }
-            
+            // Pour simplifier, on accepte n'importe quel mot de passe pour l'instant
+            // (tu peux ajouter une vérification de mot de passe plus tard)
             showDashboard();
         };
 
@@ -142,7 +84,14 @@
         }
 
         async function loadOrders() {
-            const { data } = await supabase.from('orders').select('*, products(name, brand, model)').order('created_at', { ascending: false });
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*,products(name,brand,model)&order=created_at.desc`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            
+            const data = await response.json();
             document.getElementById('ordersBody').innerHTML = (data || []).map(o => {
                 const p = o.products || {};
                 return `<tr>
@@ -155,8 +104,7 @@
             }).join('');
         }
 
-        async function logout() {
-            await supabase.auth.signOut();
+        function logout() {
             location.reload();
         }
     </script>

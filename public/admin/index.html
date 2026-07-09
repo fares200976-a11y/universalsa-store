@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - UniversalSA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 { margin-bottom: 30px; color: #333; font-size: 1.5rem; }
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .error { color: #e74c3c; margin-top: 10px; display: none; }
+        .dashboard { display: none; width: 100%; min-height: 100vh; }
+        .sidebar {
+            width: 260px;
+            background: #1a1a2e;
+            color: white;
+            padding: 25px;
+            position: fixed;
+            height: 100vh;
+        }
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 30px;
+            background: #f5f6fa;
+            min-height: 100vh;
+        }
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            border-collapse: collapse;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        th { background: #1a1a2e; color: white; padding: 16px; text-align: left; }
+        td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; }
+    </style>
+</head>
+<body>
+    <!-- LOGIN -->
+    <div id="loginPage" class="login-box">
+        <h1>Admin UniversalSA</h1>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Mot de passe" required>
+            <button type="submit">Se connecter</button>
+            <p id="errorMsg" class="error"></p>
+        </form>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboardPage" class="dashboard">
+        <aside class="sidebar">
+            <h2>UniversalSA</h2>
+            <p style="margin-top: 20px;">Commandes</p>
+            <button onclick="logout()" style="position: absolute; bottom: 25px; left: 25px; right: 25px; padding: 12px; background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); border-radius: 10px; cursor: pointer;">Déconnexion</button>
+        </aside>
+        <main class="main-content">
+            <h1>Commandes</h1>
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Client</th><th>Téléphone</th><th>Produit</th><th>Statut</th></tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = supabaseJs.createClient(
+            'https://xkuxlnxovklnkozoisml.supabase.co',
+            'sb_publishable_CpAtOIRhPin3rQ4M9xERsw_qtv0spNQ'
+        );
+
+        // Login
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                document.getElementById('errorMsg').textContent = error.message;
+                document.getElementById('errorMsg').style.display = 'block';
+                return;
+            }
+            
+            // Vérifier rôle admin
+            const { data: userData } = await supabase.from('users').select('role').eq('id', data.user.id).single();
+            
+            if (userData?.role !== 'admin') {
+                await supabase.auth.signOut();
+                document.getElementById('errorMsg').textContent = 'Accès réservé aux administrateurs';
+                document.getElementById('errorMsg').style.display = 'block';
+                return;
+            }
+            
+            showDashboard();
+        };
+
+        function showDashboard() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'flex';
+            loadOrders();
+        }
+
+        async function loadOrders() {
+            const { data } = await supabase.from('orders').select('*, products(name, brand, model)').order('created_at', { ascending: false });
+            document.getElementById('ordersBody').innerHTML = (data || []).map(o => {
+                const p = o.products || {};
+                return `<tr>
+                    <td>#${o.id}</td>
+                    <td>${o.customer_name}</td>
+                    <td>${o.phone}</td>
+                    <td>${p.brand || ''} ${p.model || ''}</td>
+                    <td>${o.status}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            location.reload();
+        }
+    </script>
+</body>
+</html>
